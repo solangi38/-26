@@ -1,17 +1,15 @@
 import streamlit as st
 import random
 
-# -----------------------------
+
 # 페이지 설정
-# -----------------------------
 st.set_page_config(
     page_title="여가 활동 추천 서비스",
     page_icon="🎭"
 )
 
-# -----------------------------
+
 # 제목
-# -----------------------------
 st.title("🎭 여가 활동 추천 서비스")
 
 st.write("""
@@ -19,9 +17,8 @@ st.write("""
 맞춤형 문화·예술·여가 활동을 추천해드립니다.
 """)
 
-# -----------------------------
+
 # 연령대 분류 함수
-# -----------------------------
 def classify_age(age):
 
     if 3 <= age <= 11:
@@ -40,9 +37,8 @@ def classify_age(age):
         return "노인"
 
 
-# -----------------------------
+
 # 활동 데이터
-# -----------------------------
 activities = [
 
     {
@@ -408,9 +404,8 @@ activities = [
     }
 ]
 
-# -----------------------------
+
 # 사용자 입력
-# -----------------------------
 age = st.number_input(
     "나이를 입력하세요",
     min_value=3,
@@ -431,9 +426,8 @@ st.write("""
 - 노인: 65세 이상
 """)
 
-# -----------------------------
+
 # 연령 기준 활동 리스트
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("👶 연령대 기준 활동 리스트")
@@ -443,9 +437,8 @@ for act in activities:
     if age_group in act["age_group"]:
         st.write(f"• {act['name']}")
 
-# -----------------------------
+
 # 비용 선택
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 income = st.radio(
@@ -456,9 +449,7 @@ income = st.radio(
     ]
 )
 
-# -----------------------------
 # 비용 기준 활동 리스트
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("💰 비용 기준 활동 리스트")
@@ -474,9 +465,8 @@ for act in activities:
     if income == act_income:
         st.write(f"• {act['name']}")
 
-# -----------------------------
+
 # 카테고리 선택
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 category = st.selectbox(
@@ -488,9 +478,8 @@ category = st.selectbox(
     ]
 )
 
-# -----------------------------
+
 # 카테고리 기준 활동 리스트
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("🎨 카테고리 기준 활동 리스트")
@@ -500,9 +489,8 @@ for act in activities:
     if category in act["category"]:
         st.write(f"• {act['name']}")
 
-# -----------------------------
+
 # 최종 추천
-# -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 if st.button("🏆 최종 추천 받기"):
@@ -553,9 +541,7 @@ if st.button("🏆 최종 추천 받기"):
     else:
         final_recommendations = top_activities[:2]
 
-    # -----------------------------
-    # 최종 결과 출력
-    # -----------------------------
+
     st.subheader("🏆 최종 추천 활동")
 
     for act, score in final_recommendations:
@@ -569,3 +555,5 @@ if st.button("🏆 최종 추천 받기"):
         )
 
         st.write("---")
+
+#와 씨 끝났다
