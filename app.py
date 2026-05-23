@@ -432,20 +432,16 @@ st.write("""
 """)
 
 # -----------------------------
-# 1차 활동 리스트
+# 연령 기준 활동 리스트
 # -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("👶 연령대 기준 활동 리스트")
 
-age_filtered = []
-
 for act in activities:
-    if age_group in act["age_group"]:
-        age_filtered.append(act)
 
-for act in age_filtered:
-    st.write(f"• {act['name']}")
+    if age_group in act["age_group"]:
+        st.write(f"• {act['name']}")
 
 # -----------------------------
 # 비용 선택
@@ -461,26 +457,22 @@ income = st.radio(
 )
 
 # -----------------------------
-# 2차 활동 리스트
+# 비용 기준 활동 리스트
 # -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("💰 비용 기준 활동 리스트")
 
-income_filtered = []
-
-for act in age_filtered:
+for act in activities:
 
     if age_group in act["income_by_age"]:
         act_income = act["income_by_age"][age_group]
+
     else:
         act_income = act["income_by_age"]["default"]
 
     if income == act_income:
-        income_filtered.append(act)
-
-for act in income_filtered:
-    st.write(f"• {act['name']}")
+        st.write(f"• {act['name']}")
 
 # -----------------------------
 # 카테고리 선택
@@ -497,20 +489,16 @@ category = st.selectbox(
 )
 
 # -----------------------------
-# 3차 활동 리스트
+# 카테고리 기준 활동 리스트
 # -----------------------------
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.subheader("🎨 카테고리 기준 활동 리스트")
 
-category_filtered = []
+for act in activities:
 
-for act in income_filtered:
     if category in act["category"]:
-        category_filtered.append(act)
-
-for act in category_filtered:
-    st.write(f"• {act['name']}")
+        st.write(f"• {act['name']}")
 
 # -----------------------------
 # 최종 추천
@@ -566,7 +554,7 @@ if st.button("🏆 최종 추천 받기"):
         final_recommendations = top_activities[:2]
 
     # -----------------------------
-    # 결과 출력
+    # 최종 결과 출력
     # -----------------------------
     st.subheader("🏆 최종 추천 활동")
 
