@@ -1,192 +1,360 @@
 import streamlit as st
-
-st.title("여가 활동 추천 서비스")
-st.write("연령대와 지역을 기반으로 맞춤 여가 활동을 추천해드립니다.")
+import random
 
 # -----------------------------
-# 1. 사용자 입력
+# 제목
 # -----------------------------
-age_group = st.selectbox(
-    "연령대를 선택하세요",
-    ["아동", "청소년", "청년", "성인", "노인"]
-)
-
-regions = [
-    # 서울
-    "강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구",
-    "노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구",
-    "성동구","성북구","송파구","양천구","영등포구","용산구","은평구",
-    "종로구","중구","중랑구",
-
-    # 경기
-    "수원시","성남시","고양시","용인시","부천시","안산시","안양시",
-    "남양주시","화성시","평택시","의정부시","시흥시","파주시",
-    "김포시","광명시","군포시","오산시","이천시","안성시",
-    "양주시","구리시","포천시","의왕시","하남시","여주시",
-    "동두천시","과천시","가평군","양평군","연천군"
-]
-
-region = st.selectbox("거주 지역을 선택하세요", regions)
-
-income = st.radio(
-    "여가 활동 비용에 대해 어떻게 생각하시나요?",
-    ["비용 부담 없이 즐기고 싶어요", "적당한 비용은 괜찮아요", "비용은 크게 상관 없어요"]
-)
-
-category = st.selectbox(
-    "선호하는 여가 카테고리를 선택하세요",
-    ["야외", "문화/예술", "힐링/휴식"]
-)
+st.title("🎭 여가 활동 추천 서비스")
+st.write("나이, 비용, 선호 카테고리를 기반으로 맞춤 여가 활동을 추천해드립니다.")
 
 # -----------------------------
-# 2. 활동 데이터
+# 연령대 분류 함수
+# -----------------------------
+def classify_age(age):
+    if 3 <= age <= 11:
+        return "아동"
+    elif 12 <= age <= 18:
+        return "청소년"
+    elif 19 <= age <= 34:
+        return "청년"
+    elif 35 <= age <= 64:
+        return "성인"
+    else:
+        return "노인"
+
+# -----------------------------
+# 활동 데이터
 # -----------------------------
 activities = [
 
-    # 복지/기본
-    {"name":"경기도 어린이박물관","category":["문화/예술"],
-     "region":["용인시"],
-     "income":["비용 부담 없이 즐기고 싶어요","적당한 비용은 괜찮아요"],
-     "age_group":["아동","청소년"]},
+    {
+        "name": "경기도 어린이박물관",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": ["아동","성인","노인"],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["전시 문화유산 관람"],
+        "link": "https://gmuseum.kr/reg/regView?category=all&id=60"
+    },
 
-    {"name":"노인복지관","category":["힐링/휴식","문화/예술"],
-     "region":["서울","경기"],
-     "income":["비용 부담 없이 즐기고 싶어요","적당한 비용은 괜찮아요","비용은 크게 상관 없어요"],
-     "age_group":["노인"]},
+    {
+        "name": "DDP 전시 관람",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "default": "비용은 크게 상관 없어요"
+        },
+        "category": ["전시 문화유산 관람"],
+        "link": "https://ddp.or.kr/index.html?menuno=240"
+    },
 
-    {"name":"청소년문화의집","category":["힐링/휴식","문화/예술"],
-     "region":[
-        "서대문구","은평구","강서구","구로구","금천구","동작구","마포구",
-        "강동구","도봉구","노원구","성동구","성북구","양천구","영등포구","용산구",
-        "구리시","평촌","하남시","광주시","성남시","과천시",
-        "안양시","수원시","남양주시","양평군","가평군","양주시"
-     ],
-     "income":["비용 부담 없이 즐기고 싶어요","적당한 비용은 괜찮아요","비용은 크게 상관 없어요"],
-     "age_group":["청소년"]},
+    {
+        "name": "대학로 연극 공연 관람",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": ["청소년","청년","성인"],
+        "income_by_age": {
+            "default": "비용은 크게 상관 없어요"
+        },
+        "category": ["공연 연극 관람"],
+        "link": "https://timeticket.co.kr/"
+    },
 
-    # 🔥 정책 기반 활동
-    {"name":"4대궁 방문 (만 24세 이하 무료)","category":["문화/예술"],
-     "region":["서울"],
-     "income":["비용 부담 없이 즐기고 싶어요"],
-     "age_group":["청소년","청년"]},
+    {
+        "name": "아르코예술극장 연극",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": ["청소년","청년","성인"],
+        "income_by_age": {
+            "default": "비용은 크게 상관 없어요"
+        },
+        "category": ["공연 연극 관람"],
+        "link": "https://theater.arko.or.kr/home/ko/main"
+    },
 
-    {"name":"국립현대미술관 무료 관람 (만 24세 이하)","category":["문화/예술"],
-     "region":["서울"],
-     "income":["비용 부담 없이 즐기고 싶어요"],
-     "age_group":["청소년","청년"]},
+    {
+        "name": "서울 생활문화센터 체부",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": ["청소년","청년","성인"],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["문화센터"],
+        "link": "https://ccasc.or.kr/"
+    },
 
-    {"name":"서울 문화패스 활용 문화생활","category":["문화/예술"],
-     "region":["서울"],
-     "income":["비용 부담 없이 즐기고 싶어요","적당한 비용은 괜찮아요"],
-     "age_group":["청년"]},
+    {
+        "name": "서울문화예술교육센터",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": ["아동","성인","노인"],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["문화센터"],
+        "link": "https://www.sfac.or.kr/"
+    },
 
-    # 🔥 구체 장소 기반 활동
-    {"name":"국립현대미술관 서울관 방문","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청소년","청년","성인","노인"]},
+    {
+        "name": "청소년문화의집",
+        "age_group": ["청소년","청년"],
+        "recommended_age": ["청소년"],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["문화센터"],
+        "link": "https://sbyc.or.kr/"
+    },
 
-    {"name":"리움미술관 방문","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청소년","청년","성인","노인"]},
+    {
+        "name": "서울노인복지센터",
+        "age_group": ["노인"],
+        "recommended_age": ["노인"],
+        "income_by_age": {
+            "default": "비용은 크게 상관 없어요"
+        },
+        "category": ["문화센터"],
+        "link": "https://seoulnoin.or.kr/senior/culture4.asp"
+    },
 
-    {"name":"DDP 전시 관람","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청소년","청년","성인","노인"]},
+    {
+        "name": "예술의전당 공연/영화 관람",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "아동": "비용 부담 없이 즐기고 싶어요",
+            "청소년": "비용 부담 없이 즐기고 싶어요",
+            "청년": "비용 부담 없이 즐기고 싶어요",
+            "성인": "비용은 크게 상관 없어요",
+            "노인": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["공연 연극 관람"],
+        "link": "https://www.sac.or.kr/site/main/membership/member_step"
+    },
 
-    {"name":"예술의전당 전시 관람","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청소년","청년","성인","노인"]},
+    {
+        "name": "서울청년문화패스",
+        "age_group": ["청년"],
+        "recommended_age": ["청년"],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["공연 연극 관람", "전시 문화유산 관람"],
+        "link": "https://www.youthcultureseoul.kr/"
+    },
 
-    {"name":"대학로 연극 공연 관람","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청년","성인","노인"]},
+    {
+        "name": "영화관 할인",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "아동": "비용은 크게 상관 없어요",
+            "청소년": "비용은 크게 상관 없어요",
+            "청년": "비용은 크게 상관 없어요",
+            "성인": "비용은 크게 상관 없어요",
+            "노인": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["공연 연극 관람"],
+        "link": "https://www.cgv.co.kr/"
+    },
 
-    {"name":"아르코예술극장 연극 관람","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청년","성인","노인"]},
+    {
+        "name": "국립현대미술관",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["전시 문화유산 관람"],
+        "link": "https://www.mmca.go.kr/visitingInfo/seoulInfo.do"
+    },
 
-    {"name":"인디 영화관 (인디스페이스)","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청년"]},
+    {
+        "name": "리움미술관",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "아동": "비용 부담 없이 즐기고 싶어요",
+            "청소년": "비용 부담 없이 즐기고 싶어요",
+            "청년": "비용은 크게 상관 없어요",
+            "성인": "비용은 크게 상관 없어요",
+            "노인": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["전시 문화유산 관람"],
+        "link": "https://www.leeumhoam.org/"
+    },
 
-    {"name":"인디 영화관 (에무시네마)","category":["문화/예술"],
-     "region":["서울"],
-     "income":["적당한 비용은 괜찮아요"],
-     "age_group":["청년"]}
+    {
+        "name": "4대궁 관람",
+        "age_group": ["아동","청소년","청년","성인","노인"],
+        "recommended_age": [],
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+        "category": ["전시 문화유산 관람"],
+        "link": "https://royal.khs.go.kr/ROYAL/contents/R703000000.do"
+    }
+
 ]
 
 # -----------------------------
-# 3. 추천 이유
+# 사용자 입력
 # -----------------------------
-def generate_reason(user, act, score):
-    parts = []
+age = st.number_input(
+    "나이를 입력하세요",
+    min_value=3,
+    max_value=100,
+    step=1
+)
 
-    if score >= 5:
-        parts.append("매우 잘 맞는 활동이에요.")
-    elif score >= 3:
-        parts.append("잘 맞는 활동이에요.")
+age_group = classify_age(age)
+
+st.success(f"분류된 연령대: {age_group}")
+
+st.write("""
+연령대 기준
+- 아동: 3~11세
+- 청소년: 12~18세
+- 청년: 19~34세
+- 성인: 35~64세
+- 노인: 65세 이상
+""")
+
+# -----------------------------
+# 1차 활동 리스트
+# -----------------------------
+st.subheader("👶 연령대 기준 활동 리스트")
+
+age_filtered = []
+
+for act in activities:
+    if age_group in act["age_group"]:
+        age_filtered.append(act)
+
+for act in age_filtered:
+    st.write(f"• {act['name']}")
+
+# -----------------------------
+# 비용 선택
+# -----------------------------
+income = st.radio(
+    "비용 조건을 선택하세요",
+    [
+        "비용 부담 없이 즐기고 싶어요",
+        "비용은 크게 상관 없어요"
+    ]
+)
+
+# -----------------------------
+# 2차 활동 리스트
+# -----------------------------
+st.subheader("💰 비용 기준 활동 리스트")
+
+income_filtered = []
+
+for act in age_filtered:
+
+    if age_group in act["income_by_age"]:
+        act_income = act["income_by_age"][age_group]
     else:
-        parts.append("가볍게 추천드려요.")
+        act_income = act["income_by_age"]["default"]
 
-    if user["age_group"] in act["age_group"]:
-        parts.append("연령대에 잘 맞고")
+    if income == act_income:
+        income_filtered.append(act)
 
-    if user["category"] in act["category"]:
-        parts.append("선호 카테고리와 일치하며")
-
-    if user["income"] in act["income"]:
-        parts.append("비용 조건도 잘 맞아서")
-
-    parts.append("추천드려요.")
-
-    return " ".join(parts)
+for act in income_filtered:
+    st.write(f"• {act['name']}")
 
 # -----------------------------
-# 4. 추천 실행
+# 카테고리 선택
 # -----------------------------
-if st.button("추천 받기"):
+category = st.selectbox(
+    "선호하는 여가 카테고리를 선택하세요",
+    [
+        "공연 연극 관람",
+        "전시 문화유산 관람",
+        "문화센터"
+    ]
+)
 
-    user = {
-        "age_group": age_group,
-        "region": region,
-        "income": income,
-        "category": category
-    }
+# -----------------------------
+# 3차 활동 리스트
+# -----------------------------
+st.subheader("🎨 카테고리 기준 활동 리스트")
+
+category_filtered = []
+
+for act in income_filtered:
+    if category in act["category"]:
+        category_filtered.append(act)
+
+for act in category_filtered:
+    st.write(f"• {act['name']}")
+
+# -----------------------------
+# 최종 추천
+# -----------------------------
+if st.button("최종 추천 받기"):
 
     results = []
 
     for act in activities:
+
         score = 0
 
-        if age_group in act["age_group"]:
+        # 연령 점수
+        if age_group in act["recommended_age"]:
+            score += 5
+        elif age_group in act["age_group"]:
+            score += 2
+
+        # 비용 점수
+        if age_group in act["income_by_age"]:
+            act_income = act["income_by_age"][age_group]
+        else:
+            act_income = act["income_by_age"]["default"]
+
+        if income == act_income:
             score += 3
 
+        # 카테고리 점수
         if category in act["category"]:
-            score += 2
-
-        if income in act["income"]:
-            score += 2
-
-        if region in act["region"] or "서울" in act["region"] or "경기" in act["region"]:
-            score += 2
+            score += 4
 
         results.append((act, score))
 
-    results.sort(key=lambda x: x[1], reverse=True)
+    # 최고 점수 계산
+    max_score = max(score for act, score in results)
 
-    st.subheader("추천 결과")
+    # 최고 점수 활동만 추출
+    top_activities = [
+        (act, score)
+        for act, score in results
+        if score == max_score
+    ]
 
-    for act, score in results[:3]:
-        reason = generate_reason(user, act, score)
+    # 동점 처리
+    if len(top_activities) >= 3:
+        final_recommendations = random.sample(top_activities, 2)
+    else:
+        final_recommendations = top_activities[:2]
 
-        st.write(f"👉 {act['name']}")
-        st.write(reason)
-        st.write(f"(적합도 점수: {score})")
+    # -----------------------------
+    # 결과 출력
+    # -----------------------------
+    st.subheader("🏆 최종 추천 활동")
+
+    for act, score in final_recommendations:
+
+        st.success(act["name"])
+
+        st.write(f"적합도 점수: {score}")
+
+        if age_group in act["recommended_age"]:
+            st.write("✔ 추천 연령대에 적합한 활동입니다.")
+
+        st.write(f"✔ 선택한 카테고리: {category}")
+
+        st.markdown(
+            f"[공식 사이트 바로가기]({act['link']})"
+        )
+
         st.write("---")
