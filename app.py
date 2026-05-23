@@ -106,7 +106,7 @@ activities = [
 
         "link": "https://timeticket.co.kr/",
 
-        "description": """
+        "description": """,
 대학로는 다양한 연극과 소극장 공연이 활발하게 운영되는
 서울 대표 공연예술 거리입니다.
 
