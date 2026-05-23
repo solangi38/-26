@@ -37,7 +37,6 @@ def classify_age(age):
         return "노인"
 
 
-
 # 활동 데이터
 activities = [
 
@@ -106,7 +105,7 @@ activities = [
 
         "link": "https://timeticket.co.kr/",
 
-        "description": """,
+        "description": """
 대학로는 다양한 연극과 소극장 공연이 활발하게 운영되는
 서울 대표 공연예술 거리입니다.
 
@@ -114,31 +113,6 @@ activities = [
 청소년·청년·성인 관람객에게 특히 적합합니다.
 학생 할인이나 조기 예매 할인 등이 제공되는 공연도 많습니다.
 """
-{
-    "name": "서울형 키즈카페",
-
-    "age_group": ["아동"],
-
-    "recommended_age": ["아동"],
-
-    "income_by_age": {
-        "default": "비용 부담 없이 즐기고 싶어요"
-    },
-
-    "category": ["문화센터"],
-
-    "link": "https://umppa.seoul.go.kr/icare/dolbomMENU5/dolbomMENU5_4/dolbomMENU5_4_1.jsp",
-
-    "description": """
-서울시가 운영하는 공공형 키즈카페로,
-아이들이 안전하게 놀이와 체험 활동을 즐길 수 있는 실내 놀이공간입니다.
-
-3~7세 아동에게 적합하며,
-미끄럼틀·블록놀이·신체활동 공간 등 다양한 놀이시설이 마련되어 있습니다.
-일반 키즈카페보다 저렴한 비용으로 이용 가능해 보호자 부담도 적습니다.
-"""
-}
-        
     },
 
     {
@@ -213,6 +187,31 @@ activities = [
 사진 교육, 미술작품 해설 강연, 여행 드로잉 등
 다양한 문화예술 체험 활동이 마련되어 있으며,
 예술을 쉽고 친근하게 접하고 싶은 시민들에게 적합합니다.
+"""
+    },
+
+    {
+        "name": "서울형 키즈카페",
+
+        "age_group": ["아동"],
+
+        "recommended_age": ["아동"],
+
+        "income_by_age": {
+            "default": "비용 부담 없이 즐기고 싶어요"
+        },
+
+        "category": ["문화센터"],
+
+        "link": "https://umppa.seoul.go.kr/icare/dolbomMENU5/dolbomMENU5_4/dolbomMENU5_4_1.jsp",
+
+        "description": """
+서울시가 운영하는 공공형 키즈카페로,
+아이들이 안전하게 놀이와 체험 활동을 즐길 수 있는 실내 놀이공간입니다.
+
+3~7세 아동에게 특히 적합하며,
+미끄럼틀·블록놀이·신체활동 공간 등 다양한 놀이시설이 마련되어 있습니다.
+일반 키즈카페보다 저렴한 비용으로 이용 가능해 보호자 부담도 적습니다.
 """
     },
 
@@ -429,7 +428,6 @@ activities = [
     }
 ]
 
-
 # 사용자 입력
 age = st.number_input(
     "나이를 입력하세요",
@@ -473,6 +471,7 @@ income = st.radio(
         "비용은 크게 상관 없어요"
     ]
 )
+
 
 # 비용 기준 활동 리스트
 st.markdown("<br><br>", unsafe_allow_html=True)
@@ -567,6 +566,7 @@ if st.button("🏆 최종 추천 받기"):
         final_recommendations = top_activities[:2]
 
 
+    # 최종 결과 출력
     st.subheader("🏆 최종 추천 활동")
 
     for act, score in final_recommendations:
@@ -580,5 +580,3 @@ if st.button("🏆 최종 추천 받기"):
         )
 
         st.write("---")
-
-#와 씨 끝났다
