@@ -7,9 +7,8 @@ st.set_page_config(
     page_icon="🎭"
 )
 
-# -----------------------------
+
 # 제목
-# -----------------------------
 st.title("🎭 여가 활동 추천 서비스")
 
 st.write("""
@@ -17,9 +16,8 @@ st.write("""
 맞춤형 문화·예술·여가 활동을 추천해드립니다.
 """)
 
-# -----------------------------
+
 # 연령대 분류 함수
-# -----------------------------
 def classify_age(age):
 
     if 3 <= age <= 11:
@@ -38,9 +36,7 @@ def classify_age(age):
         return "노인"
 
 
-# -----------------------------
 # 활동 데이터
-# -----------------------------
 activities = [
 
     {
@@ -294,9 +290,8 @@ activities = [
     }
 ]
 
-# -----------------------------
+
 # 사용자 입력
-# -----------------------------
 st.subheader("📝 사용자 정보 입력")
 
 age = st.number_input(
@@ -323,18 +318,15 @@ category = st.selectbox(
     ]
 )
 
-# -----------------------------
+
 # 결과 보기 버튼
-# -----------------------------
 st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button("🔍 결과 보기"):
 
     age_group = classify_age(age)
 
-    # -----------------------------
-    # 사용자 정보 출력
-    # -----------------------------
+
     st.markdown("---")
 
     st.header("📌 입력한 사용자 정보")
@@ -353,9 +345,8 @@ if st.button("🔍 결과 보기"):
 - 노인: 65세 이상
 """)
 
-    # -----------------------------
-    # 연령 기준 활동 리스트
-    # -----------------------------
+# 연령 기준 활동 리스트
+
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     st.header("👶 연령대 기준 활동 리스트")
@@ -365,9 +356,8 @@ if st.button("🔍 결과 보기"):
         if age_group in act["age_group"]:
             st.write(f"• {act['name']}")
 
-    # -----------------------------
-    # 비용 기준 활동 리스트
-    # -----------------------------
+
+# 비용 기준 활동 리스트
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     st.header("💰 비용 기준 활동 리스트")
@@ -383,9 +373,9 @@ if st.button("🔍 결과 보기"):
         if income == act_income:
             st.write(f"• {act['name']}")
 
-    # -----------------------------
-    # 카테고리 기준 활동 리스트
-    # -----------------------------
+
+# 카테고리 기준 활동 리스트
+
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     st.header("🎨 카테고리 기준 활동 리스트")
@@ -395,9 +385,9 @@ if st.button("🔍 결과 보기"):
         if category in act["category"]:
             st.write(f"• {act['name']}")
 
-    # -----------------------------
-    # 최종 추천 알고리즘
-    # -----------------------------
+
+# 최종? 추천 알고리즘
+
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     results = []
@@ -445,9 +435,7 @@ if st.button("🔍 결과 보기"):
     else:
         final_recommendations = top_activities[:2]
 
-    # -----------------------------
-    # 최종 추천 결과
-    # -----------------------------
+
     st.header("🏆 최종 추천 활동")
 
     for act, score in final_recommendations:
@@ -461,3 +449,4 @@ if st.button("🔍 결과 보기"):
         )
 
         st.write("---")
+#끝!
